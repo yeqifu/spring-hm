@@ -10,12 +10,58 @@
     <!--    <property name="userDao" ref="userDao"></property>-->
     <!--</bean>-->
 
-    <!--&lt;!&ndash;获得userDaoImpl&ndash;&gt;-->
-    <!--<bean id="userDao" class="com.yeqifu.dao.impl.UserDaoImpl"></bean>-->
+    <!-- 获得userDaoImpl -->
+    <bean id="userDao" class="com.yeqifu.dao.impl.UserDaoImpl"/>
+    <bean id="userDaoTwo" class="com.yeqifu.dao.impl.UserDaoImpl"/>
 
-    <!--获得userDaoImpl-->
+    <!--通过静态工厂方法，获得 userDaoImpl -->
     <bean id="userDao2" class="com.yeqifu.factory.MyFactoryBean" factory-method="getUserDao">
-        <constructor-arg name="name" value="luoyi-"></constructor-arg>
+        <constructor-arg name="name" value="luoyi-"/>
+    </bean>
+
+    <!--配置实例工厂 bean-->
+    <bean id="myFactoryBean2" class="com.yeqifu.factory.MyFactoryBean2"/>
+    <!--配置实例工厂 bean 的那个方法作为工厂方法-->
+    <bean id="userDao3" factory-bean="myFactoryBean2" factory-method="getUserDao">
+        <constructor-arg name="name" value="luoyi-"/>
+    </bean>
+
+    <!--配置 DruidDataSource 数据源-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <!--配置必要的属性-->
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc://localhost:3306/hmdp"/>
+        <property name="username" value="root"/>
+        <property name="password" value="123456"/>
+    </bean>
+
+    <bean id="clazz" class="java.lang.Class" factory-method="forName">
+        <constructor-arg name="className" value="com.mysql.cj.jdbc.Driver"/>
+    </bean>
+    <bean id="connection" class="java.sql.DriverManager" factory-method="getConnection" scope="prototype">
+        <constructor-arg name="url" value="jdbc://localhost:3306/hmdp"/>
+        <constructor-arg name="user" value="root"/>
+        <constructor-arg name="password" value="123456"/>
+    </bean>
+
+    <!--实例工厂-->
+    <bean id="simpleDateFormat" class="java.text.SimpleDateFormat">
+        <constructor-arg name="pattern" value="yyyy-MM-dd HH:mm:ss"/>
+    </bean>
+    <!--配置日期对象-->
+    <bean id="date" factory-bean="simpleDateFormat" factory-method="parse">
+        <constructor-arg name="source" value="2023-08-27 17:04:00"/>
+    </bean>
+
+    <!--静态工厂方法产生 bean 实例：inputStream-->
+    <bean id="inputStream" class="org.apache.ibatis.io.Resources" factory-method="getResourceAsStream">
+        <constructor-arg name="resource" value="mybatis-config.xml"/>
+    </bean>
+    <!--无参构造方法产生 bean 实例：sqlSessionFactoryBuilder-->
+    <bean id="sqlSessionFactoryBuilder" class="org.apache.ibatis.session.SqlSessionFactoryBuilder"/>
+    <!--实例工厂方法产生 bean 实例：sqlSessionFactory-->
+    <bean id="sqlSessionFactory" factory-bean="sqlSessionFactoryBuilder" factory-method="build">
+        <constructor-arg name="inputStream" ref="inputStream"/>
     </bean>
 
 </beans>
